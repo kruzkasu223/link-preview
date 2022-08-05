@@ -78,7 +78,7 @@
 }
 
 .inputError {
-  color: hsl(0, 100%, 85%);
+  color: #ff9999;
   text-align: left;
   margin: 1rem 0 1rem 1.5rem;
 }

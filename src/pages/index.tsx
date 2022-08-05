@@ -1,11 +1,14 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { HTMLInputTypeAttribute, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import styles from "../styles/Home.module.css";
+import { IPreviewData } from "../types/types";
 
 const Home: NextPage = () => {
   const [url, setUrl] = useState<string>("");
   const [urlError, setUrlError] = useState<string>("");
+  const [previewData, setPreviewData] = useState<IPreviewData>();
+  const [previewDataError, setPreviewDataError] = useState<IPreviewData>();
 
   const isUrlValid = (url: string): void => {
     const urlRegEx =
@@ -29,8 +32,30 @@ const Home: NextPage = () => {
   };
 
   const onPreviewClick = useCallback(() => {
-    console.log(url);
+    let newUrl = url;
+    if (!(url.startsWith("https://") || url.startsWith("http://"))) {
+      newUrl = "https://" + newUrl;
+    }
+    fetchData(newUrl);
   }, [url]);
+
+  const fetchData = async (url: string) => {
+    fetch(`https://link-preview4.p.rapidapi.com/?url=${url}&oembed=false`, {
+      method: "GET",
+      headers: {
+        // "X-RapidAPI-Key": process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "",
+        "X-RapidAPI-Host": process.env.NEXT_PUBLIC_RAPIDAPI_HOST || "",
+      },
+    })
+      .then((res) => res?.json())
+      .then((data) => {
+        setPreviewData(data);
+        console.log(data);
+      })
+      .catch((err) => {
+        setPreviewDataError(err), console.error(err);
+      });
+  };
 
   return (
     <div className={styles.container}>

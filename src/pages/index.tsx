@@ -66,6 +66,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/link.svg" alt="link" className={styles.linkIcon} />
         <h1 className={styles.title}>Welcome to Link Preview!</h1>
       </main>

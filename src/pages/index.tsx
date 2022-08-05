@@ -1,14 +1,94 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from "../styles/Home.module.css";
 import { IPreviewData } from "../types/types";
-
+const defaultData = {
+  oembed: null,
+  ogp: {
+    "al:android:app_name": ["YouTube"],
+    "al:android:package": ["com.google.android.youtube"],
+    "al:android:url": [
+      "vnd.youtube://www.youtube.com/watch?v=ybJ_R08SogU&feature=applinks",
+    ],
+    "al:ios:app_name": ["YouTube"],
+    "al:ios:app_store_id": ["544007664"],
+    "al:ios:url": [
+      "vnd.youtube://www.youtube.com/watch?v=ybJ_R08SogU&feature=applinks",
+    ],
+    "al:web:url": [
+      "http://www.youtube.com/watch?v=ybJ_R08SogU&feature=applinks",
+    ],
+    "fb:app_id": ["87741124305"],
+    "og:description": [
+      "An updated version of this live stream will be released shortly. To view this or our other live streams, click the link below.https://www.youtube.com/yellowb...",
+    ],
+    "og:image": ["https://i.ytimg.com/vi/ybJ_R08SogU/maxresdefault_live.jpg"],
+    "og:image:height": ["720"],
+    "og:image:width": ["1280"],
+    "og:site_name": ["YouTube"],
+    "og:title": [
+      "This live stream has ended. We will release a new version of this live stream soon. See link below",
+    ],
+    "og:type": ["video.other"],
+    "og:url": ["https://www.youtube.com/watch?v=ybJ_R08SogU"],
+    "og:video:height": ["360"],
+    "og:video:secure_url": ["https://www.youtube.com/embed/ybJ_R08SogU"],
+    "og:video:type": ["text/html"],
+    "og:video:url": ["https://www.youtube.com/embed/ybJ_R08SogU"],
+    "og:video:width": ["640"],
+  },
+  seo: {
+    description: [
+      "An updated version of this live stream will be released shortly. To view this or our other live streams, click the link below.https://www.youtube.com/yellowb...",
+    ],
+    keywords: [
+      "vidÃ©o, partage, tÃ©lÃ©phone-appareil photo, visiophone, gratuit, envoi",
+    ],
+    "theme-color": ["rgba(255, 255, 255, 0.98)"],
+    title: [
+      "This live stream has ended. We will release a new version of this live stream soon. See link below",
+    ],
+    "twitter:app:id:googleplay": ["com.google.android.youtube"],
+    "twitter:app:id:ipad": ["544007664"],
+    "twitter:app:id:iphone": ["544007664"],
+    "twitter:app:name:googleplay": ["YouTube"],
+    "twitter:app:name:ipad": ["YouTube"],
+    "twitter:app:name:iphone": ["YouTube"],
+    "twitter:app:url:googleplay": [
+      "https://www.youtube.com/watch?v=ybJ_R08SogU",
+    ],
+    "twitter:app:url:ipad": [
+      "vnd.youtube://www.youtube.com/watch?v=ybJ_R08SogU&feature=applinks",
+    ],
+    "twitter:app:url:iphone": [
+      "vnd.youtube://www.youtube.com/watch?v=ybJ_R08SogU&feature=applinks",
+    ],
+    "twitter:card": ["player"],
+    "twitter:description": [
+      "An updated version of this live stream will be released shortly. To view this or our other live streams, click the link below.https://www.youtube.com/yellowb...",
+    ],
+    "twitter:image": [
+      "https://i.ytimg.com/vi/ybJ_R08SogU/maxresdefault_live.jpg",
+    ],
+    "twitter:player": ["https://www.youtube.com/embed/ybJ_R08SogU"],
+    "twitter:player:height": ["360"],
+    "twitter:player:width": ["640"],
+    "twitter:site": ["@youtube"],
+    "twitter:title": [
+      "This live stream has ended. We will release a new version of this live stream soon. See link below",
+    ],
+    "twitter:url": ["https://www.youtube.com/watch?v=ybJ_R08SogU"],
+  },
+  title:
+    "This live stream has ended. We will release a new version of this live stream soon. See link below - YouTube",
+};
+console.log(defaultData);
 const Home: NextPage = () => {
   const [url, setUrl] = useState<string>("");
   const [urlError, setUrlError] = useState<string>("");
-  const [previewData, setPreviewData] = useState<IPreviewData>();
-  const [previewDataError, setPreviewDataError] = useState<IPreviewData>();
+  const [previewData, setPreviewData] = useState<IPreviewData>(defaultData);
+  const [previewDataError, setPreviewDataError] = useState<unknown>();
 
   const isUrlValid = (url: string): void => {
     const urlRegEx =
@@ -44,7 +124,7 @@ const Home: NextPage = () => {
       method: "GET",
       headers: {
         // "X-RapidAPI-Key": process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "",
-        "X-RapidAPI-Host": process.env.NEXT_PUBLIC_RAPIDAPI_HOST || "",
+        // "X-RapidAPI-Host": process.env.NEXT_PUBLIC_RAPIDAPI_HOST || "",
       },
     })
       .then((res) => res?.json())
@@ -56,6 +136,10 @@ const Home: NextPage = () => {
         setPreviewDataError(err), console.error(err);
       });
   };
+
+  useEffect(() => {
+    console.log(previewData);
+  }, [previewData]);
 
   return (
     <div className={styles.container}>
@@ -99,6 +183,41 @@ const Home: NextPage = () => {
           >
             See Preview
           </button>
+        </div>
+      </section>
+      <section className={styles.previewSection}>
+        <div className={styles.previewCard}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className={styles.previewCardImg}
+            src="https://i.ytimg.com/vi/y7MW7d8fb1Y/maxresdefault.jpg"
+            alt="site title"
+          />
+          {/* <embed
+            className={styles.previewCardEmbed}
+            src="https://www.youtube.com/embed/5Eqb_-j3FDA"
+          /> */}
+          <div className={styles.previewCardDetails}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              className={styles.previewCardLink}
+              href="//example.com"
+            >
+              example.com
+            </a>
+            <a href="//example.com" className={styles.previewCardTitle}>
+              This live stream has ended. We will release a new version of this
+              live stream soon. See link below - YouTube
+            </a>
+            <p className={styles.previewCardDesc}>
+              This live stream has ended. We will release a new version of this
+              live stream soon. See link below - YouTubeAn updated version of
+              this live stream will be released shortly. To view this or our
+              other live streams, click the link
+              below.https://www.youtube.com/yellowb...
+            </p>
+          </div>
         </div>
       </section>
     </div>

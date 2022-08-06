@@ -26,6 +26,7 @@ const Home: NextPage = () => {
 
   const urlChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPreviewData(undefined);
+    setPreviewDataError(undefined);
     setUpdatedUrl("");
     if (e.target.value) {
       isUrlValid(e.target.value);

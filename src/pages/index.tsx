@@ -96,9 +96,24 @@ const defaultData = {
 };
 
 const Home: NextPage = () => {
+  useEffect(() => {
+    fetch(`https://www.youtube.com/watch?v=5Eqb_-j3FDA`)
+      .then((res) => {
+        console.log("res-------", res);
+        console.log("body------", res.body);
+        return res?.json();
+      })
+      .then((data) => {
+        console.log("data-------", data);
+      })
+      .catch((err) => {
+        console.error("err-------", err);
+      });
+  }, []);
+
   const [url, setUrl] = useState<string>("");
   const [urlError, setUrlError] = useState<string>("");
-  const [previewData, setPreviewData] = useState<IPreviewData>(defaultData);
+  const [previewData, setPreviewData] = useState<IPreviewData>();
   const [previewDataError, setPreviewDataError] = useState<unknown>();
 
   const isUrlValid = (url: string): void => {
@@ -141,16 +156,12 @@ const Home: NextPage = () => {
       .then((res) => res?.json())
       .then((data) => {
         setPreviewData(data);
-        console.log(data);
       })
       .catch((err) => {
-        setPreviewDataError(err), console.error(err);
+        setPreviewDataError(err);
+        console.error(err);
       });
   };
-
-  useEffect(() => {
-    console.log(previewData);
-  }, [previewData]);
 
   return (
     <>

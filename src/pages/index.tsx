@@ -101,10 +101,12 @@ const Home: NextPage = () => {
       .then((res) => {
         console.log("res-------", res);
         console.log("body------", res.body);
-        return res?.json();
+        return res?.text();
       })
       .then((data) => {
         console.log("data-------", data);
+        const doc = new DOMParser().parseFromString(data, "text/html");
+        console.log("doc------", doc.head.getElementsByTagName("meta"));
       })
       .catch((err) => {
         console.error("err-------", err);

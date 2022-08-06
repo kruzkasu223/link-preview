@@ -1,14 +1,17 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { Loader } from "../components/loader";
 import styles from "../styles/Home.module.css";
-import { IPreviewData } from "../types/types";
+import type { IPreviewData } from "../types/types";
 
 const Home: NextPage = () => {
   const [url, setUrl] = useState<string>("");
+  const [updatedUrl, setUpdatedUrl] = useState<string>("");
   const [urlError, setUrlError] = useState<string>("");
   const [previewData, setPreviewData] = useState<IPreviewData>();
   const [previewDataError, setPreviewDataError] = useState<unknown>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const isUrlValid = (url: string): void => {
     const urlRegEx =
@@ -22,6 +25,8 @@ const Home: NextPage = () => {
   };
 
   const urlChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPreviewData(undefined);
+    setUpdatedUrl("");
     if (e.target.value) {
       isUrlValid(e.target.value);
       setUrl(e.target.value);
@@ -36,10 +41,12 @@ const Home: NextPage = () => {
     if (!(url.startsWith("https://") || url.startsWith("http://"))) {
       newUrl = "https://" + newUrl;
     }
+    setUpdatedUrl(newUrl);
     fetchData(newUrl);
   }, [url]);
 
   const fetchData = async (url: string) => {
+    setIsLoading(true);
     fetch(`https://link-preview4.p.rapidapi.com/?url=${url}&oembed=false`, {
       method: "GET",
       headers: {
@@ -50,14 +57,18 @@ const Home: NextPage = () => {
       .then((res) => res?.json())
       .then((data) => {
         setPreviewData(data);
+        setIsLoading(false);
       })
       .catch((err) => {
-        setPreviewDataError(err), console.error(err);
+        setIsLoading(false);
+        setPreviewDataError(err);
+        console.error(err);
       });
   };
 
   return (
     <>
+      {isLoading && <Loader />}
       <div className={styles.container}>
         <Head>
           <title>Link Preview</title>
@@ -146,7 +157,7 @@ const Home: NextPage = () => {
                   <div className={styles.previewCardDetails}>
                     <a
                       target="_blank"
-                      href={"//" + url}
+                      href={updatedUrl}
                       rel="noopener noreferrer"
                       className={styles.previewCardLink}
                     >
@@ -156,7 +167,7 @@ const Home: NextPage = () => {
                     </a>
                     <a
                       target="_blank"
-                      href={"//" + url}
+                      href={updatedUrl}
                       rel="noopener noreferrer"
                       className={styles.previewCardTitle}
                     >

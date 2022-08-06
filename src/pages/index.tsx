@@ -286,7 +286,7 @@ const Home: NextPage = () => {
             href="https://thekruz.tech"
             className={styles.footerLink}
           >
-            Kru'Z
+            {`Kru'Z`}
           </a>
         </p>
       </footer>

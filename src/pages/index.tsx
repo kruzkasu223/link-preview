@@ -4,101 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import styles from "../styles/Home.module.css";
 import { IPreviewData } from "../types/types";
 
-const defaultData = {
-  oembed: null,
-  ogp: {
-    "al:android:app_name": ["YouTube"],
-    "al:android:package": ["com.google.android.youtube"],
-    "al:android:url": [
-      "vnd.youtube://www.youtube.com/watch?v=5Eqb_-j3FDA\u0026feature=applinks",
-    ],
-    "al:ios:app_name": ["YouTube"],
-    "al:ios:app_store_id": ["544007664"],
-    "al:ios:url": [
-      "vnd.youtube://www.youtube.com/watch?v=5Eqb_-j3FDA\u0026feature=applinks",
-    ],
-    "al:web:url": [
-      "http://www.youtube.com/watch?v=5Eqb_-j3FDA\u0026feature=applinks",
-    ],
-    "fb:app_id": ["87741124305"],
-    "og:description": [
-      "Letâs transcend boundaries and bridge distances through compassion, love and identity.#Pasoori #RealMagic #CokeStudioSeason14 #SoundOfTheNationListen on Spot...",
-    ],
-    "og:image": ["https://i.ytimg.com/vi/5Eqb_-j3FDA/maxresdefault.jpg"],
-    "og:image:height": ["720"],
-    "og:image:width": ["1280"],
-    "og:site_name": ["YouTube"],
-    "og:title": ["Coke Studio | Season 14 | Pasoori | Ali Sethi x Shae Gill"],
-    "og:type": ["video.other"],
-    "og:url": ["https://www.youtube.com/watch?v=5Eqb_-j3FDA"],
-    "og:video:height": ["720"],
-    "og:video:secure_url": ["https://www.youtube.com/embed/5Eqb_-j3FDA"],
-    "og:video:tag": [
-      "coke studio",
-      "cocacola pakistan",
-      "coke studio pakistan",
-      "SoundOfTheNation",
-      "Xulfi",
-      "FusionMusic",
-      "Coke Studio Season 14",
-      "Season 14",
-      "Real Magic",
-      "Music",
-      "Coke Studio 14",
-      "Ali Sethi",
-      "Shaegill",
-      "Pasoori",
-      "Shae gill",
-    ],
-    "og:video:type": ["text/html"],
-    "og:video:url": ["https://www.youtube.com/embed/5Eqb_-j3FDA"],
-    "og:video:width": ["1280"],
-  },
-  seo: {
-    description: [
-      "Letâs transcend boundaries and bridge distances through compassion, love and identity.#Pasoori #RealMagic #CokeStudioSeason14 #SoundOfTheNationListen on Spot...",
-    ],
-    keywords: [
-      "coke studio, cocacola pakistan, coke studio pakistan, SoundOfTheNation, Xulfi, FusionMusic, Coke Studio Season 14, Season 14, Real Magic, Music, Coke Studio 14, Ali Sethi, Shaegill, Pasoori, Shae gill",
-    ],
-    "theme-color": ["rgba(255, 255, 255, 0.98)"],
-    title: ["Coke Studio | Season 14 | Pasoori | Ali Sethi x Shae Gill"],
-    "twitter:app:id:googleplay": ["com.google.android.youtube"],
-    "twitter:app:id:ipad": ["544007664"],
-    "twitter:app:id:iphone": ["544007664"],
-    "twitter:app:name:googleplay": ["YouTube"],
-    "twitter:app:name:ipad": ["YouTube"],
-    "twitter:app:name:iphone": ["YouTube"],
-    "twitter:app:url:googleplay": [
-      "https://www.youtube.com/watch?v=5Eqb_-j3FDA",
-    ],
-    "twitter:app:url:ipad": [
-      "vnd.youtube://www.youtube.com/watch?v=5Eqb_-j3FDA\u0026feature=applinks",
-    ],
-    "twitter:app:url:iphone": [
-      "vnd.youtube://www.youtube.com/watch?v=5Eqb_-j3FDA\u0026feature=applinks",
-    ],
-    "twitter:card": ["player"],
-    "twitter:description": [
-      "Letâs transcend boundaries and bridge distances through compassion, love and identity.#Pasoori #RealMagic #CokeStudioSeason14 #SoundOfTheNationListen on Spot...",
-    ],
-    "twitter:image": ["https://i.ytimg.com/vi/5Eqb_-j3FDA/maxresdefault.jpg"],
-    "twitter:player": ["https://www.youtube.com/embed/5Eqb_-j3FDA"],
-    "twitter:player:height": ["720"],
-    "twitter:player:width": ["1280"],
-    "twitter:site": ["@youtube"],
-    "twitter:title": [
-      "Coke Studio | Season 14 | Pasoori | Ali Sethi x Shae Gill",
-    ],
-    "twitter:url": ["https://www.youtube.com/watch?v=5Eqb_-j3FDA"],
-  },
-  title: "Coke Studio | Season 14 | Pasoori | Ali Sethi x Shae Gill - YouTube",
-};
-
 const Home: NextPage = () => {
   const [url, setUrl] = useState<string>("");
   const [urlError, setUrlError] = useState<string>("");
-  const [previewData, setPreviewData] = useState<IPreviewData>(defaultData);
+  const [previewData, setPreviewData] = useState<IPreviewData>();
   const [previewDataError, setPreviewDataError] = useState<unknown>();
 
   const isUrlValid = (url: string): void => {
@@ -134,23 +43,18 @@ const Home: NextPage = () => {
     fetch(`https://link-preview4.p.rapidapi.com/?url=${url}&oembed=false`, {
       method: "GET",
       headers: {
-        // "X-RapidAPI-Key": process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "",
-        // "X-RapidAPI-Host": process.env.NEXT_PUBLIC_RAPIDAPI_HOST || "",
+        "X-RapidAPI-Key": process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "",
+        "X-RapidAPI-Host": process.env.NEXT_PUBLIC_RAPIDAPI_HOST || "",
       },
     })
       .then((res) => res?.json())
       .then((data) => {
         setPreviewData(data);
-        console.log(data);
       })
       .catch((err) => {
         setPreviewDataError(err), console.error(err);
       });
   };
-
-  useEffect(() => {
-    console.log(previewData);
-  }, [previewData]);
 
   return (
     <>

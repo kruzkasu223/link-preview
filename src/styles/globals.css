@@ -20,3 +20,9 @@ a {
 p {
   margin: 0;
 }
+
+@media screen and (max-width: 830px) {
+  html {
+    font-size: 12px;
+  }
+}

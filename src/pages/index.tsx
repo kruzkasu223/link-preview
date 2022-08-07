@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Loader } from "../components/loader";
 import styles from "../styles/Home.module.css";
 import type { IPreviewData } from "../types/types";
@@ -12,6 +12,19 @@ const Home: NextPage = () => {
   const [previewData, setPreviewData] = useState<IPreviewData>();
   const [previewDataError, setPreviewDataError] = useState<unknown>();
   const [isLoading, setIsLoading] = useState(false);
+  const additionalData: any = useMemo(() => {
+    let data: any = previewData || "";
+    data = { ...data, ...data?.seo, ...data?.ogp };
+    delete data.oembed;
+    delete data.seo;
+    delete data.ogp;
+    Object.keys(data).map((key) => {
+      if (typeof data?.[key] === "string") data[key] = data?.[key];
+      else data[key] = data?.[key]?.[0];
+    });
+    if (Object.keys(data).length === 0) data = "";
+    return data;
+  }, [previewData]);
 
   const isUrlValid = (url: string): void => {
     const urlRegEx =
@@ -78,7 +91,6 @@ const Home: NextPage = () => {
         </Head>
 
         <header className={styles.header}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/link.svg" alt="link" className={styles.linkIcon} />
           <h1 className={styles.title}>Welcome to Link Previewer!</h1>
         </header>
@@ -137,7 +149,6 @@ const Home: NextPage = () => {
                     />
                   ) : (
                     <>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         className={styles.previewCardImg}
                         src={
@@ -188,6 +199,21 @@ const Home: NextPage = () => {
                 </>
               )}
             </div>
+          </section>
+        ) : (
+          ""
+        )}
+        {additionalData ? (
+          <section className={styles.addInfoSection}>
+            <details>
+              <summary>Additional Information</summary>
+              {Object.keys(additionalData).map((key) => (
+                <p key={key} className={styles.addInfoLine}>
+                  <span className={styles.addInfoKey}>{key}:</span>{" "}
+                  {additionalData[key]}
+                </p>
+              ))}
+            </details>
           </section>
         ) : (
           ""

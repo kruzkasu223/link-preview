@@ -31,7 +31,7 @@
   font-size: 1.25rem;
 }
 
-.footerLink:hover {
+.footerLink {
   text-decoration: underline;
 }
 

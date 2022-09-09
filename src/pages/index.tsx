@@ -1,84 +1,73 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import { useCallback, useMemo, useState } from "react";
-import { Loader } from "../components/loader";
-import styles from "../styles/Home.module.css";
-import type { IPreviewData } from "../types/types";
+import type { NextPage } from "next"
+import Head from "next/head"
+import { useCallback, useState } from "react"
+import { Loader } from "../components/loader"
+import styles from "../styles/Home.module.css"
+import { urlRegEx } from "../utils/constants"
+import type { IPreviewData } from "../utils/types"
+
+const APIURL: string = process.env.NEXT_PUBLIC_DEV
+  ? "http://localhost:3000"
+  : "https://lp.kruz.me"
 
 const Home: NextPage = () => {
-  const [url, setUrl] = useState<string>("");
-  const [updatedUrl, setUpdatedUrl] = useState<string>("");
-  const [urlError, setUrlError] = useState<string>("");
-  const [previewData, setPreviewData] = useState<IPreviewData>();
-  const [previewDataError, setPreviewDataError] = useState<unknown>();
-  const [isLoading, setIsLoading] = useState(false);
-  const additionalData: any = useMemo(() => {
-    let data: any = previewData || "";
-    data = { ...data, ...data?.seo, ...data?.ogp };
-    delete data.oembed;
-    delete data.seo;
-    delete data.ogp;
-    Object.keys(data).map((key) => {
-      if (typeof data?.[key] === "string") data[key] = data?.[key];
-      else data[key] = data?.[key]?.[0];
-    });
-    if (Object.keys(data).length === 0) data = "";
-    return data;
-  }, [previewData]);
+  const [url, setUrl] = useState<string>("")
+  const [updatedUrl, setUpdatedUrl] = useState<string>("")
+  const [urlError, setUrlError] = useState<string>("")
+  const [previewData, setPreviewData] = useState<IPreviewData>()
+  const [previewDataError, setPreviewDataError] = useState<unknown>()
+  const [isLoading, setIsLoading] = useState(false)
 
   const isUrlValid = (url: string): void => {
-    const urlRegEx =
-      /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
-
     if (urlRegEx.test(url)) {
-      setUrlError("");
-      return;
+      setUrlError("")
+      return
     }
-    setUrlError("please enter valid url");
-  };
+    setUrlError("please enter valid url")
+  }
 
   const urlChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPreviewData(undefined);
-    setPreviewDataError(undefined);
-    setUpdatedUrl("");
+    setPreviewData(undefined)
+    setPreviewDataError(undefined)
+    setUpdatedUrl("")
     if (e.target.value) {
-      isUrlValid(e.target.value);
-      setUrl(e.target.value);
+      isUrlValid(e.target.value)
+      setUrl(e.target.value)
     } else {
-      setUrlError("");
-      setUrl("");
+      setUrlError("")
+      setUrl("")
     }
-  };
+  }
 
   const onPreviewClick = useCallback(() => {
-    let newUrl = url;
+    let newUrl = url
     if (!(url.startsWith("https://") || url.startsWith("http://"))) {
-      newUrl = "https://" + newUrl;
+      newUrl = "https://" + newUrl
     }
-    setUpdatedUrl(newUrl);
-    fetchData(newUrl);
-  }, [url]);
+    setUpdatedUrl(newUrl)
+    fetchData(newUrl)
+  }, [url])
 
   const fetchData = async (url: string) => {
-    setIsLoading(true);
-    fetch(`https://link-preview4.p.rapidapi.com/?url=${url}&oembed=false`, {
+    setIsLoading(true)
+    fetch(`${APIURL}/api?url=${url}`, {
       method: "GET",
-      headers: {
-        "X-RapidAPI-Key": process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "",
-        "X-RapidAPI-Host": process.env.NEXT_PUBLIC_RAPIDAPI_HOST || "",
-      },
     })
-      .then((res) => res?.json())
+      .then(async (res) => {
+        const response = await res?.json()
+        if (!res.ok) throw response
+        return response
+      })
       .then((data) => {
-        setPreviewData(data);
-        setIsLoading(false);
+        setPreviewData(data)
+        setIsLoading(false)
       })
       .catch((err) => {
-        setIsLoading(false);
-        setPreviewDataError(err);
-        console.error(err);
-      });
-  };
+        setIsLoading(false)
+        setPreviewDataError(err)
+        console.error(err)
+      })
+  }
 
   return (
     <>
@@ -111,7 +100,7 @@ const Home: NextPage = () => {
                     !urlError &&
                     url
                   )
-                    onPreviewClick();
+                    onPreviewClick()
                 }}
               />
               <span className={styles.inputError}>{urlError}</span>
@@ -136,33 +125,17 @@ const Home: NextPage = () => {
                 </div>
               ) : (
                 <>
-                  {previewData?.ogp?.["og:video:url"]?.[0] ||
-                  previewData?.ogp?.["og:video:secure_url"]?.[0] ||
-                  previewData?.seo?.["twitter:player"]?.[0] ? (
+                  {previewData?.video ? (
                     <embed
                       className={styles.previewCardImg}
-                      src={
-                        previewData?.ogp?.["og:video:url"]?.[0] ||
-                        previewData?.ogp?.["og:video:secure_url"]?.[0] ||
-                        previewData?.seo?.["twitter:player"]?.[0]
-                      }
+                      src={previewData?.video}
                     />
                   ) : (
                     <>
                       <img
                         className={styles.previewCardImg}
-                        src={
-                          previewData?.ogp?.["og:image"]?.[0] ||
-                          previewData?.seo?.["twitter:image"]?.[0] ||
-                          "/placeholder.png"
-                        }
-                        alt={
-                          previewData?.title ||
-                          previewData?.ogp?.["og:title"]?.[0] ||
-                          previewData?.seo?.title?.[0] ||
-                          previewData?.seo?.["twitter:title"]?.[0] ||
-                          "Title"
-                        }
+                        src={previewData?.image || "/placeholder.png"}
+                        alt={previewData?.title || "Title"}
                       />
                     </>
                   )}
@@ -173,9 +146,7 @@ const Home: NextPage = () => {
                       rel="noopener noreferrer"
                       className={styles.previewCardLink}
                     >
-                      {previewData?.ogp?.["og:site_name"]?.[0] ||
-                        previewData?.seo?.["twitter:site"]?.[0] ||
-                        url}
+                      {url}
                     </a>
                     <a
                       target="_blank"
@@ -183,37 +154,15 @@ const Home: NextPage = () => {
                       rel="noopener noreferrer"
                       className={styles.previewCardTitle}
                     >
-                      {previewData?.title ||
-                        previewData?.ogp?.["og:title"]?.[0] ||
-                        previewData?.seo?.title?.[0] ||
-                        previewData?.seo?.["twitter:title"]?.[0] ||
-                        "Title"}
+                      {previewData?.title || "Title"}
                     </a>
                     <p className={styles.previewCardDesc}>
-                      {previewData?.ogp?.["og:description"]?.[0] ||
-                        previewData?.seo?.description?.[0] ||
-                        previewData?.seo?.["twitter:description"]?.[0] ||
-                        "Description"}
+                      {previewData?.description || "Description"}
                     </p>
                   </div>
                 </>
               )}
             </div>
-          </section>
-        ) : (
-          ""
-        )}
-        {additionalData ? (
-          <section className={styles.addInfoSection}>
-            <details>
-              <summary>Additional Information</summary>
-              {Object.keys(additionalData).map((key) => (
-                <p key={key} className={styles.addInfoLine}>
-                  <span className={styles.addInfoKey}>{key}:</span>{" "}
-                  {additionalData[key]}
-                </p>
-              ))}
-            </details>
           </section>
         ) : (
           ""
@@ -225,7 +174,7 @@ const Home: NextPage = () => {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://thekruz.tech"
+            href="https://kruz.me"
             className={styles.footerLink}
           >
             {`Kru'Z`}
@@ -233,7 +182,7 @@ const Home: NextPage = () => {
         </p>
       </footer>
     </>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
